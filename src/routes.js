@@ -1,23 +1,23 @@
-const express = require('express');
+import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
-const OngController = require('./controller/OngController');
-const IncidentController = require('./controller/IncidentController');
-const ProfileController = require('./controller/ProfileController');
-const SessionController = require('./controller/SessionController');
+import Logon from './pages/Logon';
+import Register from './pages/Register';
 
-
-const routes = express.Router();
-
-routes.post('/sessions', SessionController.create);
-
-routes.get('/ongs', OngController.index);
-routes.post('/ongs', OngController.create);
-
-routes.get('/profile', ProfileController.index);
-
-routes.get('/incidents', IncidentController.index);
-routes.post('/incidents', IncidentController.create);
-routes.delete('/incidents/:id', IncidentController.delete);
+import Profile from './pages/Profile';
+import NewIncident from './pages/NewIncident';
 
 
-module.exports = routes;
+export default function Routes() {
+    return (
+        <BrowserRouter>
+            <Switch>
+                <Route path="/" exact component={Logon} />
+                <Route path="/register" component={Register} />
+                <Route path="/profile" component={Profile} />
+                <Route path="/incidents/new" component={NewIncident} />
+
+            </Switch>
+        </BrowserRouter>
+    );
+}
