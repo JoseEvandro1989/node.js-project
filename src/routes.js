@@ -1,23 +1,46 @@
-import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+const express = require('express');
+const { celebrate, Segments, Joi } = require('celebrate');
 
-import Logon from './pages/Logon';
-import Register from './pages/Register';
+const OngController = require('./controller/OngController');
+const IncidentController = require('./controller/IncidentController');
+const ProfileController = require('./controller/ProfileController');
+const SessionController = require('./controller/SessionController');
 
-import Profile from './pages/Profile';
-import NewIncident from './pages/NewIncident';
+
+const routes = express.Router();
+
+routes.post('/sessions', SessionController.create);
+
+routes.get('/ongs', OngController.index);
+
+routes.post('/ongs', celebrate({
+    [Segments.BODY]: Joi.object().keys({
+        name: Joi.string().required(),
+        email: Joi.string().required().email(),
+        whatsapp: Joi.string().required().min(10).max(11),
+        city: Joi.string().required(),
+        uf: Joi.string().required().length(2),
+    })
+}), OngController.create);
+
+routes.get('/profile', celebrate({
+    [Segments.HEADERS]: Joi.object({
+        authorization: Joi.string().required()
+    }).unknown(),
+}) ,ProfileController.index);
+
+routes.get('/incidents', celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+        page: Joi.number(),
+    })
+}) ,IncidentController.index);
+
+routes.post('/incidents', IncidentController.create);
+routes.delete('/incidents/:id', celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+        id: Joi.number().required(),
+    })
+}) ,IncidentController.delete);
 
 
-export default function Routes() {
-    return (
-        <BrowserRouter>
-            <Switch>
-                <Route path="/" exact component={Logon} />
-                <Route path="/register" component={Register} />
-                <Route path="/profile" component={Profile} />
-                <Route path="/incidents/new" component={NewIncident} />
-
-            </Switch>
-        </BrowserRouter>
-    );
-}
+module.exports = routes;
